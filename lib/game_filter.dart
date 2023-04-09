@@ -2,10 +2,6 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'game_model.dart';
-import 'game_item.dart';
-import 'games_list_screen.dart';
-
-import 'main.dart';
 
 class ApiService {
   static const _baseUrl = 'https://www.mmobomb.com/api1/games';

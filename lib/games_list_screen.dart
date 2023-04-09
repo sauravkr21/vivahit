@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'game_model.dart';
 import 'game_filter.dart';
-import 'game_item.dart';
+
 
 Future<List<Game>> fetchGame() async {
   final response =
@@ -61,7 +61,7 @@ class _GamesListScreenState extends State<GamesListScreen> {
             ),
           ],
           bottom: PreferredSize(
-            preferredSize: Size.fromHeight(90.0),
+            preferredSize: Size.fromHeight(100.0),
             child: Column(
               children: [
                 Padding(
@@ -96,11 +96,11 @@ class _GamesListScreenState extends State<GamesListScreen> {
                         child: Text('All platforms'),
                       ),
                       DropdownMenuItem(
-                        value: 'pc',
+                        value: 'PC (Windows)',
                         child: Text('PC'),
                       ),
                       DropdownMenuItem(
-                        value: 'browser',
+                        value: 'Web Browser',
                         child: Text('Browser'),
                       ),
                     ],
@@ -110,15 +110,18 @@ class _GamesListScreenState extends State<GamesListScreen> {
             ),
           ),
         ),
-        body: Row(
-          children: [
-            Expanded(
-              child: FutureBuilder<List<Game>>(
+        body:FutureBuilder<List<Game>>(
                 future: futureGame,
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
+                    final games = snapshot.data!
+                        .where((game) => _platform == 'all' || game.platform == _platform)
+                        .where((game) =>
+                    _filter.isEmpty ||
+                        game.title.toLowerCase().contains(_filter.toLowerCase()))
+                        .toList();
                     return ListView.builder(
-                      itemCount: snapshot.data!.length,
+                      itemCount: games.length,
                       itemBuilder: (_, index) => Container(
                         child: Container(
                           margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -132,45 +135,22 @@ class _GamesListScreenState extends State<GamesListScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "${snapshot.data![index].title}",
+                                "${games[index].title}",
                                 style: TextStyle(
                                   fontSize: 18.0,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                               SizedBox(height: 10),
-                              Image.network("${snapshot.data![index].thumbnail}",
+                              Image.network("${games[index].thumbnail}",
                                    fit: BoxFit.cover,),
-                              Text("${snapshot.data![index].genre}"),
-                              Text("${snapshot.data![index].platform}"),
-                              Text("${snapshot.data![index].release_date}"),
+                              Text("${games[index].genre}"),
+                              Text("${games[index].platform}"),
+                              Text("${games[index].release_date}"),
                             ],
                           ),
                         ),
                       ),
-                    );
-                  } else {
-                    return Center(child: CircularProgressIndicator());
-                  }
-                },
-              ),
-            ),
-            Expanded(
-              child: FutureBuilder<List<Game>>(
-                future: _games,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    final games = snapshot.data!
-                        .where((game) => _platform == 'all' || game.platform == _platform)
-                        .where((game) =>
-                    _filter.isEmpty ||
-                        game.title.toLowerCase().contains(_filter.toLowerCase()))
-                        .toList();
-                    return ListView.builder(
-                      itemCount: games.length,
-                      itemBuilder: (context, index) {
-                        return GameItem(game: games[index]);
-                      },
                     );
                   } else if (snapshot.hasError) {
                     return Center(child: Text('${snapshot.error}'));
@@ -179,21 +159,9 @@ class _GamesListScreenState extends State<GamesListScreen> {
                   }
                 },
               ),
-            ),
-          ],
-        ),
-
       ),
     );
   }
 }
-List<Game> _filterGames(List<Game> games, String filter) {
-  if (filter.isEmpty) {
-    return games;
-  }
-  final lowercaseFilter = filter.toLowerCase();
-  return games.where((game) {
-    return game.title.toLowerCase().contains(lowercaseFilter);
-  }).toList();
-}
+
 
