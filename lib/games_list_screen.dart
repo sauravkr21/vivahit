@@ -5,7 +5,6 @@ import 'package:http/http.dart' as http;
 import 'game_model.dart';
 import 'game_filter.dart';
 
-
 Future<List<Game>> fetchGame() async {
   final response =
       await http.get(Uri.parse('https://www.mmobomb.com/api1/games'));
@@ -16,11 +15,11 @@ Future<List<Game>> fetchGame() async {
     throw Exception('Failed to load album');
   }
 }
+
 class GamesListScreen extends StatefulWidget {
   @override
   _GamesListScreenState createState() => _GamesListScreenState();
 }
-
 
 class _GamesListScreenState extends State<GamesListScreen> {
   late Future<List<Game>> _games;
@@ -34,8 +33,6 @@ class _GamesListScreenState extends State<GamesListScreen> {
     futureGame = fetchGame();
     _games = ApiService.fetchGames(_platform);
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -110,58 +107,77 @@ class _GamesListScreenState extends State<GamesListScreen> {
             ),
           ),
         ),
-        body:FutureBuilder<List<Game>>(
-                future: futureGame,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    final games = snapshot.data!
-                        .where((game) => _platform == 'all' || game.platform == _platform)
-                        .where((game) =>
-                    _filter.isEmpty ||
-                        game.title.toLowerCase().contains(_filter.toLowerCase()))
-                        .toList();
-                    return ListView.builder(
-                      itemCount: games.length,
-                      itemBuilder: (_, index) => Container(
-                        child: Container(
-                          margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                          padding: EdgeInsets.all(20.0),
-                          decoration: BoxDecoration(
-                            color: Color(0xff97FFFF),
-                            borderRadius: BorderRadius.circular(15.0),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "${games[index].title}",
-                                style: TextStyle(
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              SizedBox(height: 10),
-                              Image.network("${games[index].thumbnail}",
-                                   fit: BoxFit.cover,),
-                              Text("${games[index].genre}"),
-                              Text("${games[index].platform}"),
-                              Text("${games[index].release_date}"),
-                            ],
+        body: FutureBuilder<List<Game>>(
+          future: futureGame,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              final games = snapshot.data!
+                  .where((game) =>
+                      _platform == 'all' || game.platform == _platform)
+                  .where((game) =>
+                      _filter.isEmpty ||
+                      game.title.toLowerCase().contains(_filter.toLowerCase()))
+                  .toList();
+              return ListView.builder(
+                itemCount: games.length,
+                itemBuilder: (_, index) => Container(
+                  child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    padding: EdgeInsets.all(20.0),
+                    decoration: BoxDecoration(
+                      color: Color(0xff97ffff),
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "${games[index].title}",
+                          style: TextStyle(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ),
-                    );
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('${snapshot.error}'));
-                  } else {
-                    return Center(child: CircularProgressIndicator());
-                  }
-                },
-              ),
+                        SizedBox(height: 10),
+                        Image.network(
+                          "${games[index].thumbnail}",
+                          fit: BoxFit.cover,
+                        ),
+                        Text(
+                          "${games[index].genre}",
+                          style: TextStyle(
+                            fontSize: 15.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          "${games[index].platform}",
+                          style: TextStyle(
+                            fontSize: 15.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          "${games[index].release_date}",
+                          style: TextStyle(
+                            fontSize: 15.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            } else if (snapshot.hasError) {
+              return Center(child: Text('${snapshot.error}'));
+            } else {
+              return Center(child: CircularProgressIndicator());
+            }
+          },
+        ),
       ),
     );
   }
 }
-
-
