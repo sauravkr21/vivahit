@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.vivahit">
+    <uses-permission android:name="android.permission.INTERNET"/>
    <application
         android:label="vivahit"
         android:name="${applicationName}"
