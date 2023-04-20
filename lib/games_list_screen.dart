@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'game_model.dart';
-import 'game_filter.dart';
 
 Future<List<Game>> fetchGame() async {
   final response =
@@ -22,7 +21,6 @@ class GamesListScreen extends StatefulWidget {
 }
 
 class _GamesListScreenState extends State<GamesListScreen> {
-  late Future<List<Game>> _games;
   final TextEditingController _filterController = TextEditingController();
   String _filter = '';
   String _platform = 'all';
@@ -31,7 +29,6 @@ class _GamesListScreenState extends State<GamesListScreen> {
   void initState() {
     super.initState();
     futureGame = fetchGame();
-    _games = ApiService.fetchGames(_platform);
   }
 
   @override
@@ -85,7 +82,6 @@ class _GamesListScreenState extends State<GamesListScreen> {
                       setState(() {
                         _platform = value!;
                       });
-                      _games;
                     },
                     items: [
                       DropdownMenuItem(
